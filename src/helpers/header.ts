@@ -1,4 +1,5 @@
-import { isPlainObject } from './util'
+import { Method } from '../types'
+import { deepMerge, isPlainObject } from './util'
 const normalizeHeaderName = (headers: any, normalizedName: string): void => {
   if (!headers) {
     return
@@ -44,4 +45,19 @@ export const parseHeaders = (headers: string): any => {
   })
 
   return parsed
+}
+/**
+ * 配置扁平化, 例如经过合并配置的headers是个复杂对象，common get post.... 但事实上每次请求只需当次请求方法的响应配置
+ * 该方法依次按common [method] 原headers配置的优先级顺序深度合并。最后将common [method]等属性剔除
+ */
+export function flattenHeaders(headers: any, method: Method): any {
+  if (!headers) {
+    return headers
+  }
+  headers = deepMerge(headers.common, headers[method], headers)
+  const methodsToDelete = ['delete', 'get', 'head', 'options', 'post', 'put', 'patch', 'common']
+  methodsToDelete.forEach(method => {
+    delete headers[method]
+  })
+  return headers
 }
