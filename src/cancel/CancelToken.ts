@@ -13,9 +13,10 @@ import Cancel from './Cancel'
  * 2 直接给config的cancelToken new一个CancelToken。区别是需要自己声明一个cancel变量 用来在new CancelToken时的执行器函数内接受取消函数。
  */
 export default class CancelToken {
+  // 实例属性
   promise: Promise<Cancel>
   reason?: Cancel
-  // 第二种用法 本质上是一样的
+  //静态方法 用于第二种用法 本质上是一样的
   static source(): CancelTokenSource {
     let cancel!: Canceler
     const token = new CancelToken(c => {
@@ -44,6 +45,7 @@ export default class CancelToken {
       resolvePromise(this.reason)
     })
   }
+  // 实例方法
   throwIfRequested(): void {
     if (this.reason) {
       throw this.reason
