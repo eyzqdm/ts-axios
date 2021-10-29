@@ -6,6 +6,7 @@ import xhr from './xhr'
 import transform from './transform'
 const axios = (config: AxiosRequestConfig): AxiosPromise => {
   // 发送请求之前处理config
+  throwIfCancellationRequested(config)
   processConfig(config)
   return xhr(config).then(res => {
     return transformResponseData(res)
@@ -30,6 +31,11 @@ const transformUrl = (config: AxiosRequestConfig): string => {
 const transformResponseData = (res: AxiosResponse): AxiosResponse => {
   res.data = transform(res.data, res.headers, res.config.transformResponse)
   return res
+}
+const throwIfCancellationRequested = (config: AxiosRequestConfig): void => {
+  if (config.cancelToken) {
+    config.cancelToken.throwIfRequested()
+  }
 }
 
 export default axios
