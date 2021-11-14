@@ -2,7 +2,7 @@ import { AxiosInstance, AxiosRequestConfig, AxiosStatic } from './types'
 import Axios from './core/Axios'
 import { extend } from './helpers/util'
 import defaults from './defaults'
-import mergeConfig from './core/mergeConfig'
+import mergeConfig from './core/merge'
 import CancelToken from './cancel/CancelToken'
 import Cancel, { isCancel } from './cancel/Cancel'
 // 实现axios混合对象 他是一个对象 有Axios类的所有原型属性和实例属性
@@ -29,11 +29,19 @@ const axios = createInstance(defaults)
  * axios直接调用相当于调用request 由于之前已经将其this绑定到context上 因此其内部的
  * this.defaults是直接指向context的defaults的。
  */
-axios.create = (config) => {
+axios.create = config => {
   return createInstance(mergeConfig(defaults, config))
 }
 axios.CancelToken = CancelToken
 axios.Cancel = Cancel
 axios.isCancel = isCancel
-
+axios.all = function all(promises) {
+  return Promise.all(promises)
+}
+axios.spread = function spread(callback) {
+  return function wrap(arr) {
+    return callback.apply(null, arr)
+  }
+}
+axios.Axios = Axios
 export default axios

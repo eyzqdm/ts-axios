@@ -1,7 +1,14 @@
-import { AxiosRequestConfig, AxiosPromise, Method, AxiosResponse, ResolvedFn, RejectedFn } from '../types'
-import dispatchRequest from './dispatchRequest'
+import {
+  AxiosRequestConfig,
+  AxiosPromise,
+  Method,
+  AxiosResponse,
+  ResolvedFn,
+  RejectedFn
+} from '../types'
+import dispatchRequest, { transformUrl } from './dispatchRequest'
 import InterceptorManager from './InterceptorManager'
-import mergeConfig from './mergeConfig'
+import mergeConfig from './merge'
 
 interface Interceptors {
   request: InterceptorManager<AxiosRequestConfig>
@@ -33,10 +40,12 @@ export default class Axios {
     }
     config = mergeConfig(this.defaults, config)
     // 将请求发送放入数组
-    const chain: PromiseChain[] = [{
-      resolved: dispatchRequest,
-      rejected: undefined
-    }]
+    const chain: PromiseChain[] = [
+      {
+        resolved: dispatchRequest,
+        rejected: undefined
+      }
+    ]
     // 将请求拦截器倒序插入数组前部
     this.interceptors.request.forEach(interceptor => {
       chain.unshift(interceptor)
@@ -83,6 +92,10 @@ export default class Axios {
 
   patch(url: string, data?: any, config?: AxiosRequestConfig): AxiosPromise {
     return this._request('patch', url, config, data)
+  }
+  getUri(config?: AxiosRequestConfig): string {
+    config = mergeConfig(this.defaults, config)
+    return transformUrl(config)
   }
 
   _request(method: Method, url: string, config?: AxiosRequestConfig, data?: any) {

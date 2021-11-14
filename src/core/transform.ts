@@ -1,10 +1,6 @@
 import { AxiosTransformer } from '../types'
 
-export default (
-  data: any,
-  headers: any,
-  fns?: AxiosTransformer | AxiosTransformer[]
-): any => {
+export default (data: any, headers: any, fns?: AxiosTransformer | AxiosTransformer[]): any => {
   if (!fns) {
     return data
   }

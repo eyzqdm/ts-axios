@@ -1,6 +1,6 @@
 import { transformRequest, transformResponse } from '../helpers/data'
-import { flattenHeaders, processHeaders } from '../helpers/header'
-import { bulidURL } from '../helpers/url'
+import { flattenHeaders, parseHeaders, processHeaders } from '../helpers/header'
+import { buildURL, combineURL, isAbsoluteURL } from '../helpers/url'
 import { AxiosPromise, AxiosRequestConfig, AxiosResponse } from '../types'
 import xhr from './xhr'
 import transform from './transform'
@@ -20,9 +20,12 @@ const processConfig = (config: AxiosRequestConfig) => {
   config.data = transform(config.data, config.headers, config.transformRequest)
   config.headers = flattenHeaders(config.headers, config.method!)
 }
-const transformUrl = (config: AxiosRequestConfig): string => {
-  const { url, params } = config
-  return bulidURL(url, params)
+export const transformUrl = (config: AxiosRequestConfig): string => {
+  let { url, params, paramsSerializer, baseURL } = config
+  if (baseURL && !isAbsoluteURL(url!)) {
+    url = combineURL(baseURL, url)
+  }
+  return buildURL(url!, params, paramsSerializer)
 }
 /* const transformHeaders = (config: AxiosRequestConfig) => {
   const { headers = {}, data } = config

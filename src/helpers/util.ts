@@ -18,18 +18,17 @@ export const isPlainObject = (val: any): val is Object => {
  */
 export function extend<T, U>(to: T, from: U): T & U {
   for (const key in from) {
-    ; (to as T & U)[key] = from[key] as any
+    ;(to as T & U)[key] = from[key] as any
   }
   return to as T & U
 }
 /**
  * 递归合并 思路类似深拷贝
- * 非引用值 直接合并
- * 引用值 判断原属性是否是引用值 是 则递归合并 不是 则用一个空对象与之合并
+ * 基本类型 直接合并
+ * 引用类型值 判断原属性是否是引用类型，如果是，则递归合并。不是，则用一个空对象与之合并。
  */
 export const deepMerge = (...objs: any[]): any => {
   const result = Object.create(null)
-
   objs.forEach(obj => {
     if (obj) {
       Object.keys(obj).forEach(key => {
@@ -48,4 +47,13 @@ export const deepMerge = (...objs: any[]): any => {
     }
   })
   return result
+}
+/**
+ * 判断formdata 用于调整contentType字段
+ */
+export function isFormData(val: any): boolean {
+  return typeof val !== 'undefined' && val instanceof FormData
+}
+export function isURLSearchParams(val: any): val is URLSearchParams {
+  return typeof val !== 'undefined' && val instanceof URLSearchParams
 }

@@ -14,11 +14,14 @@ const fromVal2Strat = (val1: any, val2: any): any => {
     return val2
   }
 }
-const stratKeysFromVal2 = ['url', 'params', 'data']
+const defMerge = (target: any, source: any) => {
+  return typeof source !== 'undefined' ? source : typeof target !== 'undefined' ? target : null
+}
+/* const stratKeysFromVal2 = ['url', 'params', 'data'];
 
 stratKeysFromVal2.forEach(key => {
-  strats[key] = fromVal2Strat
-})
+  strats[key] = fromVal2Strat;
+}); */
 //复杂对象合并 headers
 const deepMergeStrat = (val1: any, val2: any): any => {
   if (isPlainObject(val2)) {
@@ -27,17 +30,17 @@ const deepMergeStrat = (val1: any, val2: any): any => {
     return val2
   } else if (isPlainObject(val1)) {
     return deepMerge(val1)
-  } else if (typeof val1 !== 'undefined') {
+  } else {
     return val1
   }
 }
-
+const strats = Object.create(null)
+// 需要深度合并的属性
 const stratKeysDeepMerge = ['headers', 'auth']
-
 stratKeysDeepMerge.forEach(key => {
   strats[key] = deepMergeStrat
 })
-const strats = Object.create(null)
+
 /**
  *
  * @param config1 默认配置
@@ -66,7 +69,7 @@ export default function mergeConfig(
 
   function mergeField(key: string): void {
     // 优先自定义配置合并策略 没有则用默认策略
-    const strat = strats[key] || defaultStrat
+    const strat = strats[key] || defMerge
     config[key] = strat(config1[key], config2![key])
   }
 
